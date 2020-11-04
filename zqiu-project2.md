@@ -62,4 +62,28 @@ For each character in the flag, we run queries for at most all of the printable
 character, which is 100 queries.
 
 
+
 ## Problem 3
+
+## Problem 4
+
+For problem 4, we construct a query for `fourb` such that the message `M'` have 
+the same length as `M`, the message in `foura`. We then devided up the cipher 
+text from `foura` to 3 16-byte blocks, and append the last block of `cipher_a`
+with the first 2 blocks of `cipher_b` to form our final cipher, which returns
+`b'Admin access granted.'` when fed into `fourc`.
+
+
+## Problem 5
+
+We observe the following quality of the decryption function:
+$$
+m[1] = AES^{-1}(k, c[1]) \oplus c[0] =  AES^{-1}(k, c[1]) \oplus k\\
+m[2] = AES^{-1}(k, c[2]) \oplys c[1]
+$$
+Therefore, if $c[0]=c[1]$, $AES^{-1}(k, c[1]) = AES^{-1}(k, c[2])$ and 
+$m[1]\oplusm[2]=k$. Using this property, we design the algorithm as follows:
+- Output `test_c = bytearray(32)` to `fourb`; 
+- Because `test_c` is not properly padded, `fourb` will return plain message `test_m`, which we parse as `m1+m2`;
+- Let `k=bitwise_xor(m1, m2)` and use `k` and given message to construct `c3` with the encryption method outlined in the question;
+- Query our encrypted message and get success response.
