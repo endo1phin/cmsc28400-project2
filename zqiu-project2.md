@@ -87,3 +87,39 @@ $m[1]\oplus[2]=c[0]=k$. Using this property, we design the algorithm as follows:
 - Because `test_c` is not properly padded, `fiveb` will return plain message `test_m`, which we parse as `m1+m2`;
 - Let `k=bitwise_xor(m1, m2)` and use `k` and target message to construct `c3` with the encryption method outlined in the question;
 - Query our encrypted message to `fivec` and get success response.
+
+
+## Problem 6
+
+We first observed the following property of `AES-CBC`: given a 32 bytes 
+ciphertext, divide it up into 2 16-byte blocks, $c_0$ and $c_1$, with 
+corresponding message $m_0$ and $m_1$:
+$$
+m_1 = AES^{-1}(k, c_0) \oplus c_0 \Longrightarrow AES^{-1}(k, c_0) = m_1 \oplus c_0
+$$
+We noticed that, although we cannot get information about the real $m_1$ from 
+the oracle, we can know the padding information of the message. If we know 
+the length of the padding, we can recover the padding part of the message, which
+is constructed with a known pattern. We achieve this by constructing a 
+$\hat c_0$ such that for every block, the $\hat m_1$ recovered is consist 
+entirely of paddings. Since we did not change anything about $c_1$, we can 
+recover $AES^{-1}(k, c_0) = m_1 \oplus c_0 = \hat c_0 \oplus \hat m_1$. Since
+we already know the real $c_1$, we can recover $m_1$ with a simple xor. We 
+construct the algorithm as follows:
+
+Given a 32 bytes ciphertext, divide it up into 2 16-byte blocks, `c0` and `c1`:
+1. For the `16-i`th byte in `m1`:
+   1. Confirm `partial_aes1` has length `i-1`;
+   2. xor `partial_aes1` with the padding portion to get `partial_c0_hat`
+   3. Prepand `partial_c0_hat` with `c1` to get later part of the query
+   4. For each possible byte `b`:
+      1. Take the first `16-i` bytes of `c0` and `b`, forming the first part of the query
+      2. Form the query by appending two parts of the query
+      3. Feed query to `sixb`
+      4. If get back true, update `partial_aes1` with xor of `b` and ascii 1
+2. xor `partial_aes1` with `c1` to get `m1`
+3. Print out `m1`
+
+We repeat the process for each 16-byte block pairs in the original cipher text.
+Each byte would take at most 256 queries to the oracle, which for a 128 bytes
+message, takes $2^{15}$ queries.
