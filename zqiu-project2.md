@@ -36,7 +36,8 @@ to be sufficiently clear.
 
 ## Problem 2
 
-**Flag**: `And a million miles / Hello from the other side`
+**Flag**: 
+```And a million miles / Hello from the other side```
 
 ### Finding flag
 
@@ -65,6 +66,22 @@ character, which is 100 queries.
 
 ## Problem 3
 
+**Flag**: ```serIOUS FaLl ```
+
+We observed that, although adding the first byte to the query will always 
+increase the response's length by 1, additional bytes in the query will not 
+increase the length of the response if they overlaps with previous segments in 
+the message. Therefore we choose the first two bytes by query all possible 
+2-bytes combination of letters and space, which makes $50^2$ queries for the 
+first two bytes, and choosing the one that only increased response length by 1.
+We then continue to test out byte-by-byte, choosing each byte that, when added,
+does not increase the length of the response. Each additional byte costs about
+50 queries.
+
+The attack does not contradict the fact that AES-CTR has good CPA security. In 
+this attack, we are exploiting a weakness in zlib compression, which is 
+unrelated to AES-CTR. 
+
 ## Problem 4
 
 For problem 4, we construct a query for `fourb` such that the message `M'` have 
@@ -90,6 +107,8 @@ $m[1]\oplus[2]=c[0]=k$. Using this property, we design the algorithm as follows:
 
 
 ## Problem 6
+
+**Flag**: ```I had a crazy dream last night! I was swimming in an ocean of orange soda. Turns out it was just a Fanta sea.```
 
 We first observed the following property of `AES-CBC`: given a 32 bytes 
 ciphertext, divide it up into 2 16-byte blocks, $c_0$ and $c_1$, with 
@@ -122,4 +141,4 @@ Given a 32 bytes ciphertext, divide it up into 2 16-byte blocks, `c0` and `c1`:
 
 We repeat the process for each 16-byte block pairs in the original cipher text.
 Each byte would take at most 256 queries to the oracle, which for a 128 bytes
-message, takes $2^{15}$ queries.
+message, takes at most $2^{15}$ queries.
