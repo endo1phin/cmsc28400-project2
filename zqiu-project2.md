@@ -1,5 +1,5 @@
 # Project 2: Symmetric Encryption Vulnerabilties
-*Jeff Qiu*  
+*Jeff Qiu (With input from Hongji Liu)*  
 *November 6, 2020*
 
 ## Problem 1
@@ -98,8 +98,8 @@ $$
 m[1] = AES^{-1}(k, c[1]) \oplus c[0]\\
 m[2] = AES^{-1}(k, c[2]) \oplus c[1]
 $$
-Therefore, if $c[0]=c[1]$, $AES^{-1}(k, c[1]) = AES^{-1}(k, c[2])$ and 
-$m[1]\oplus[2]=c[0]=k$. Using this property, we design the algorithm as follows:
+Therefore, if $c[1]=c[2]$, $AES^{-1}(k, c[1]) = AES^{-1}(k, c[2])$ and 
+$m[1]\oplus m[2]=c[0]=k$. Using this property, we design the algorithm as follows:
 - Output `test_c = bytearray(32)` to `fiveb`; 
 - Because `test_c` is not properly padded, `fiveb` will return plain message `test_m`, which we parse as `m1+m2`;
 - Let `k=bitwise_xor(m1, m2)` and use `k` and target message to construct `c3` with the encryption method outlined in the question;
