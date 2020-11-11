@@ -263,11 +263,15 @@ def problem6(cnetid):
     c_bytes = p4_chop(c)
     n_blocks = len(c_bytes)
 
-    for n in range(0, n_blocks-2):
-        partial_aes1 = bytearray()
+    for n in range(0, n_blocks-1):
+        partial_aes1_list = [bytearray()]
         c1 = c_bytes[n+1]
         c0 = c_bytes[n]
-        for i in range(1, 17):
+        i = 1
+        while i < 17:
+            byte_found = 0
+            partial_aes1  = partial_aes1_list.pop()
+            partial_m1_hat = get_padding(i)
             partial_m1_hat = get_padding(i)
             partial_c0_hat = bitwise_xor(partial_aes1, partial_m1_hat[1:])
             query_back = partial_c0_hat + bytearray(c1)
@@ -276,35 +280,15 @@ def problem6(cnetid):
                 query = query_front + b.to_bytes(1,'big') + query_back
                 if make_query("sixb", cnetid, query) == b'true':
                     new_aes_byte = b ^ 1
-                    partial_aes1 =  new_aes_byte.to_bytes(1, 'big') + partial_aes1 
-                    break         
-        m0 = bitwise_xor(partial_aes1, c0)
-        print(m0.decode(), end='')
-    
-    partial_aes1_list = [bytearray()]
-    c1 = c_bytes[n_blocks-1]
-    c0 = c_bytes[n_blocks-2]
-    i = 1
-    while i < 17:
-        byte_found = 0
+                    partial_aes1_list.append(new_aes_byte.to_bytes(1, 'big') + partial_aes1)
+                    byte_found = 1
+                    if n!=n_blocks-2:
+                        break
+            if byte_found:
+                i+=1
         partial_aes1  = partial_aes1_list.pop()
-        partial_m1_hat = get_padding(i)
-        partial_m1_hat = get_padding(i)
-        partial_c0_hat = bitwise_xor(partial_aes1, partial_m1_hat[1:])
-        query_back = partial_c0_hat + bytearray(c1)
-        query_front = c0[:-i]
-        for b in range(256):
-            query = query_front + b.to_bytes(1,'big') + query_back
-            if make_query("sixb", cnetid, query) == b'true':
-                new_aes_byte = b ^ 1
-                partial_aes1_list.append(new_aes_byte.to_bytes(1, 'big') + partial_aes1)
-                byte_found = 1
-        if byte_found:
-            i+=1
-    partial_aes1  = partial_aes1_list.pop()
-    m0 = bitwise_xor(partial_aes1, c0)
-    print(m0.decode(), end='')  
-    print()
+        m0 = bitwise_xor(partial_aes1, c0)
+        print(m0.decode(), end='')  
 
 
 ################################################################################
