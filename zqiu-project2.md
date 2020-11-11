@@ -114,7 +114,7 @@ We first observed the following property of `AES-CBC`: given a 32 bytes
 ciphertext, divide it up into 2 16-byte blocks, $c_0$ and $c_1$, with 
 corresponding message $m_0$ and $m_1$:
 $$
-m_1 = AES^{-1}(k, c_0) \oplus c_0 \Longrightarrow AES^{-1}(k, c_0) = m_1 \oplus c_0
+m_1 = AES^{-1}(k, c_1) \oplus c_0 \Longrightarrow AES^{-1}(k, c_1) = m_1 \oplus c_0
 $$
 We noticed that, although we cannot get information about the real $m_1$ from 
 the oracle, we can know the padding information of the message. If we know 
@@ -122,7 +122,7 @@ the length of the padding, we can recover the padding part of the message, which
 is constructed with a known pattern. We achieve this by constructing a 
 $\hat c_0$ such that for every block, the $\hat m_1$ recovered is consist 
 entirely of paddings. Since we did not change anything about $c_1$, we can 
-recover $AES^{-1}(k, c_0) = m_1 \oplus c_0 = \hat c_0 \oplus \hat m_1$. Since
+recover $AES^{-1}(k, c_1) = m_1 \oplus c_0 = \hat c_0 \oplus \hat m_1$. Since
 we already know the real $c_1$, we can recover $m_1$ with a simple xor. We 
 construct the algorithm as follows:
 
